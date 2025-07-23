@@ -10,9 +10,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Search, SlidersHorizontal, Heart } from "lucide-react-native";
-import cn from "../../utils/cn";
+import cn from "@utils/cn";
 import { router } from "expo-router";
-import Animated from "react-native-reanimated";
 
 const categories = ["All", "Men", "Women", "Kids Wear"];
 
@@ -77,9 +76,7 @@ export default function Home() {
           </TouchableOpacity>
         </View>
 
-        <Text className="mb-2 mt-6 text-base font-semibold">
-          Top Categories
-        </Text>
+        <Text className="mb-2 mt-6 text-lg font-bold">Top Categories</Text>
         <View className="flex-row gap-3 space-x-3">
           {categories.map((cat) => (
             <TouchableOpacity
@@ -105,14 +102,18 @@ export default function Home() {
 
         {/* Popular Products */}
         <View className="mb-3 mt-6 flex-row items-center justify-between">
-          <Text className="text-lg font-semibold">Popular Products</Text>
-          <Text className="text-sm text-gray-400">View All</Text>
+          <Text className="text-lg font-bold">Popular Products</Text>
+          <TouchableOpacity activeOpacity={0.5}>
+            <Text className="text-sm text-gray-400">View All</Text>
+          </TouchableOpacity>
         </View>
 
         <View className="flex-row flex-wrap justify-between">
           {products.map((item) => (
-            <View
+            <TouchableOpacity
               key={item.id}
+              activeOpacity={0.7}
+              onPress={() => router.push(`/product/${item.id}`)}
               className="mb-4 w-[48%] rounded-xl border border-gray-100 bg-white p-2 shadow-sm"
             >
               <Image
@@ -128,7 +129,7 @@ export default function Home() {
                 {/* <Heart size={18} color="gray" /> */}
               </View>
               <Text className="mt-1 text-base font-bold">{item.price}</Text>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
