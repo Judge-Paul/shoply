@@ -1,6 +1,8 @@
 import { Tabs } from "expo-router";
 import { Home, ShoppingCart } from "lucide-react-native";
 
+import "./global.css";
+
 export default function TabLayout() {
 	return (
 		<Tabs
