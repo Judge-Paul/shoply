@@ -6,10 +6,13 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  Button,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Search, SlidersHorizontal, Heart } from "lucide-react-native";
-import cn from "../utils/cn";
+import cn from "../../utils/cn";
+import { router } from "expo-router";
+import Animated from "react-native-reanimated";
 
 const categories = ["All", "Men", "Women", "Kids Wear"];
 

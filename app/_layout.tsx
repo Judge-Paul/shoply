@@ -1,31 +1,10 @@
-import { Tabs } from "expo-router";
-import { Home, ShoppingCart } from "lucide-react-native";
+import { Stack } from "expo-router";
 
-import "./global.css";
-
-export default function TabLayout() {
+export default function RootLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: "black",
-        tabBarInactiveTintColor: "gray",
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "",
-          tabBarIcon: ({ color }) => <Home color={color} />,
-          headerShown: false,
-        }}
-      />
-      <Tabs.Screen
-        name="cart"
-        options={{
-          title: "",
-          tabBarIcon: ({ color }) => <ShoppingCart color={color} />,
-        }}
-      />
-    </Tabs>
+    <Stack>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="product" options={{ headerShown: false }} />
+    </Stack>
   );
 }
