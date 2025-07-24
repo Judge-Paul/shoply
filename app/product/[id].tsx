@@ -166,20 +166,10 @@ export default function ProductDetail() {
       </View>
       <ScrollView className="px-4 pt-12" showsVerticalScrollIndicator={false}>
         <View className="mb-6 overflow-hidden rounded-b-3xl bg-gray-200">
-          {/* Show loading indicator over image if still loading */}
-          {/* {isLoading && (
-            <View className="absolute inset-0 z-10 items-center justify-center bg-gray-200 bg-opacity-75">
-              <ActivityIndicator size="large" color="#007AFF" />
-            </View>
-          )} */}
           {!product?.image ? (
             <View className="h-80 w-full animate-pulse" />
           ) : (
-            <Image
-              source={{ uri: product.image }}
-              className="h-80 w-full"
-              // resizeMode="contain"
-            />
+            <Image source={{ uri: product.image }} className="h-80 w-full" />
           )}
         </View>
 

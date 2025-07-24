@@ -17,8 +17,6 @@ import SadDog from "@assets/sad-dog.png";
 import { useCart } from "context/CartContext";
 import useCategories from "hooks/useCategories";
 
-const categories = ["All", "Men", "Women", "Kids Wear"];
-
 export default function Home() {
   const {
     data: products,
@@ -160,8 +158,6 @@ export default function Home() {
 }
 
 function ListHeader() {
-  const [activeCategory, setActiveCategory] = useState<number | null>(null);
-
   const {
     data: categories,
     isPending: categoriesLoading,
@@ -218,22 +214,26 @@ function ListHeader() {
             ItemSeparatorComponent={() => <View className="w-4" />}
             renderItem={({ item }) => (
               <TouchableOpacity
-                onPress={() => setActiveCategory(item.id)}
+                onPress={() => {
+                  router.push({
+                    pathname: "/products",
+                    params: {
+                      categorySlug: item.slug,
+                      categoryName: item.name,
+                    },
+                  });
+                }}
                 className="items-center"
                 activeOpacity={0.8}
               >
                 <Image
                   source={{ uri: item.image }}
-                  className={cn(
-                    "h-24 w-24 rounded-xl",
-                    activeCategory === item.id && "opacity-90",
-                  )}
+                  className={cn("h-24 w-24 rounded-xl")}
                   resizeMode="cover"
                 />
                 <Text
                   className={cn(
                     "mt-2 text-center text-sm font-medium text-gray-700",
-                    activeCategory === item.id && "text-primary",
                   )}
                 >
                   {item.name}

@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Home, ShoppingCart } from "lucide-react-native";
+import { Home, Package, ShoppingCart } from "lucide-react-native";
 import { Platform, Text, View } from "react-native";
 import { useCart } from "context/CartContext";
 
@@ -13,7 +13,7 @@ export default function TabLayout() {
         tabBarInactiveTintColor: "gray",
         tabBarShowLabel: false,
         tabBarStyle: {
-          height: Platform.OS === "ios" ? 70 : 110,
+          height: Platform.OS === "ios" ? 75 : 110,
           paddingTop: 10,
         },
       }}
@@ -25,6 +25,20 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <View className="items-center">
               <Home color={color} strokeWidth={focused ? 2.8 : 1.5} />
+              {focused && (
+                <View className="mt-1 h-1 w-1 rounded-full bg-primary" />
+              )}
+            </View>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="products"
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color, focused }) => (
+            <View className="items-center">
+              <Package color={color} strokeWidth={focused ? 2.8 : 1.5} />
               {focused && (
                 <View className="mt-1 h-1 w-1 rounded-full bg-primary" />
               )}
