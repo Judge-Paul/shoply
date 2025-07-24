@@ -18,6 +18,8 @@ import { useCart } from "context/CartContext";
 import useCategories from "hooks/useCategories";
 
 export default function Home() {
+  const [searchQuery, setSearchQuery] = useState("");
+
   const {
     data: products,
     isPending: productsLoading,
@@ -27,6 +29,18 @@ export default function Home() {
   } = useProducts();
 
   const { getQty, addItem, increment, decrement } = useCart();
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      router.push({
+        pathname: "/products",
+        params: {
+          searchQuery: searchQuery.trim(),
+        },
+      });
+      // setSearchQuery("");
+    }
+  };
 
   function renderProduct({ item }: { item: Product }) {
     const id = String(item.id);
@@ -134,7 +148,13 @@ export default function Home() {
           justifyContent: "space-between",
           paddingHorizontal: 16,
         }}
-        ListHeaderComponent={ListHeader}
+        ListHeaderComponent={
+          <ListHeader
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onSearch={handleSearch}
+          />
+        }
         ListEmptyComponent={
           <View className="items-center px-4 py-10">
             <Image source={SadDog} className="aspect-square h-60" />
@@ -159,7 +179,15 @@ export default function Home() {
   );
 }
 
-function ListHeader() {
+function ListHeader({
+  searchQuery,
+  setSearchQuery,
+  onSearch,
+}: {
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  onSearch: () => void;
+}) {
   const {
     data: categories,
     isPending: categoriesLoading,
@@ -176,11 +204,17 @@ function ListHeader() {
 
       <View className="h-16 flex-row items-center gap-2.5 space-x-3">
         <View className="h-full flex-1 flex-row items-center space-x-2 rounded-xl bg-gray-100 px-4 py-3">
-          <Search size={20} color="gray" />
+          <TouchableOpacity onPress={onSearch}>
+            <Search size={20} color="gray" />
+          </TouchableOpacity>
           <TextInput
-            placeholder="Search"
+            placeholder="Search products..."
             className="flex-1 pl-3 text-gray-700"
             placeholderTextColor="#aaa"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            onSubmitEditing={onSearch}
+            returnKeyType="search"
           />
         </View>
         <TouchableOpacity
