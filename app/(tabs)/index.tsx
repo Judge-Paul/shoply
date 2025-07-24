@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
+  RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Search, SlidersHorizontal } from "lucide-react-native";
@@ -21,6 +22,8 @@ export default function Home() {
     data: products,
     isPending: productsLoading,
     isError: productsError,
+    refetch,
+    isRefetching,
   } = useProducts();
 
   return (
@@ -62,6 +65,14 @@ export default function Home() {
                 : "No products available yet."}
             </Text>
           </View>
+        }
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={refetch}
+            colors={["#000"]}
+            tintColor="#000"
+          />
         }
         showsVerticalScrollIndicator={false}
       />
@@ -142,7 +153,7 @@ function renderProduct({ item }: { item: Product }) {
           params: {
             title: item.title,
             price: item.price.toString(),
-            image: item.image,
+            image: item.images[0],
           },
         })
       }
@@ -150,7 +161,7 @@ function renderProduct({ item }: { item: Product }) {
     >
       <View>
         <Image
-          source={{ uri: item.image }}
+          source={{ uri: item.images[0] }}
           className="h-40 w-full rounded-t-lg"
           resizeMode="cover"
         />
