@@ -13,16 +13,49 @@ import { BlurView } from "expo-blur";
 import { router } from "expo-router";
 import SadDog from "@assets/sad-dog.png";
 import { useCart } from "context/CartContext";
-import { convertToNaira } from "@utils/currency";
+import { convertToNaira, convertToUSDNumber } from "@utils/currency";
 import cn from "@utils/cn";
+import { useState } from "react";
+import { Notifier, NotifierComponents } from "react-native-notifier";
 
 export default function CartScreen() {
-  const { items, subtotal, totalQuantity, increment, decrement, remove } =
-    useCart();
+  const {
+    items,
+    subtotal,
+    totalQuantity,
+    increment,
+    decrement,
+    remove,
+    clear,
+  } = useCart();
 
-  const discount = 0;
+  const [promoCode, setPromoCode] = useState("");
+  const [discount, setDiscount] = useState(0);
+  const [applied, setApplied] = useState(false);
+
+  const applyPromo = () => {
+    if (applied && promoCode === "2025") return;
+
+    if (promoCode === "2025") {
+      setDiscount(convertToUSDNumber(2025));
+      setApplied(true);
+      Notifier.showNotification({
+        title: "Coupon Applied",
+        description: "You've saved ₦2,025 with your valid coupon!",
+        hideOnPress: true,
+        Component: NotifierComponents.Alert,
+        componentProps: {
+          alertType: "success",
+        },
+      });
+    } else {
+      setDiscount(0);
+      setApplied(false);
+      alert("Invalid Promo Code");
+    }
+  };
+
   const grandTotal = subtotal - discount;
-
   return (
     <SafeAreaView className="flex-1 bg-[#f9fafb]">
       <View className="absolute left-0 right-0 top-0 z-10 pt-1">
@@ -37,7 +70,16 @@ export default function CartScreen() {
               <ChevronLeft size={35} color="black" />
             </TouchableOpacity>
             <Text className="text-xl font-bold">My Cart</Text>
-            <View className="w-9" />
+            <TouchableOpacity
+              onPress={() => {
+                clear();
+                setApplied(false);
+                setDiscount(0);
+                setPromoCode("");
+              }}
+            >
+              <Trash2 size={24} color="black" />
+            </TouchableOpacity>
           </View>
         </BlurView>
       </View>
@@ -77,16 +119,22 @@ export default function CartScreen() {
               />
             ))}
           </ScrollView>
-
           <View className="absolute bottom-0 left-0 right-0 rounded-t-3xl bg-white px-6 py-5 shadow-2xl">
-            <View className="flex-row items-center rounded-full bg-gray-100 pl-5">
+            <View className="flex-row items-center justify-center rounded-full bg-gray-100 pl-7">
               <TextInput
-                className="flex-1 text-base text-gray-500"
+                value={promoCode}
+                onChangeText={setPromoCode}
+                className="flex-1 place-self-start text-base text-gray-500"
                 placeholder="Enter Promocode"
                 placeholderTextColor="#b0b0b0"
               />
-              <TouchableOpacity className="rounded-full bg-primary px-10 py-5">
-                <Text className="text-sm font-semibold text-white">Apply</Text>
+              <TouchableOpacity
+                onPress={applyPromo}
+                className="rounded-full bg-primary px-10 py-5"
+              >
+                <Text className="text-sm font-semibold text-white">
+                  {applied ? "Applied" : "Apply"}
+                </Text>
               </TouchableOpacity>
             </View>
 
@@ -97,7 +145,7 @@ export default function CartScreen() {
               </View>
               <View className="flex-row justify-between">
                 <Text className="text-gray-500">Discount</Text>
-                <Text className="font-medium">-${discount.toFixed(2)}</Text>
+                <Text className="font-medium">-{convertToNaira(discount)}</Text>
               </View>
               <View className="mt-2 flex-row justify-between border-t border-gray-200 pt-2">
                 <Text className="text-lg font-bold">Grand Total</Text>
