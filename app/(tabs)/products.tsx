@@ -218,7 +218,7 @@ export default function Products() {
               : products[i].id.toString()
         }
         className="pt-28"
-        renderItem={error ? null : loading ? renderSkeleton : renderProduct}
+        renderItem={loading ? renderSkeleton : renderProduct}
         numColumns={2}
         columnWrapperStyle={{
           justifyContent: "space-between",

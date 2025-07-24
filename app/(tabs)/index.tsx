@@ -136,25 +136,19 @@ export default function Home() {
               ? `skeleton-${index}`
               : products[index].id.toString()
         }
-        renderItem={
-          productsError
-            ? null
-            : productsLoading
-              ? renderSkeleton
-              : renderProduct
-        }
+        renderItem={productsLoading ? renderSkeleton : renderProduct}
         numColumns={2}
         columnWrapperStyle={{
           justifyContent: "space-between",
           paddingHorizontal: 16,
         }}
-        ListHeaderComponent={
+        ListHeaderComponent={() => (
           <ListHeader
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             onSearch={handleSearch}
           />
-        }
+        )}
         ListEmptyComponent={
           <View className="items-center px-4 py-10">
             <Image source={SadDog} className="aspect-square h-60" />
@@ -217,12 +211,12 @@ function ListHeader({
             returnKeyType="search"
           />
         </View>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           activeOpacity={0.7}
           className="flex aspect-square h-full items-center justify-center rounded-xl bg-primary"
         >
           <SlidersHorizontal size={20} color="white" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       <Text className="mb-2 mt-6 text-lg font-bold">Top Categories</Text>
@@ -237,7 +231,7 @@ function ListHeader({
             ))}
           </View>
         ) : categoriesError || !categories || categories.length === 0 ? (
-          <View className="w=full h-24 flex-1 items-center justify-center">
+          <View className="h-24 w-full flex-1 items-center justify-center">
             <Text>No categories available.</Text>
           </View>
         ) : (
@@ -282,7 +276,10 @@ function ListHeader({
 
       <View className="mb-3 mt-6 flex-row items-center justify-between">
         <Text className="text-lg font-bold">Popular Products</Text>
-        <TouchableOpacity activeOpacity={0.7}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => router.push("/products")}
+        >
           <Text className="text-sm text-gray-400">View All</Text>
         </TouchableOpacity>
       </View>
