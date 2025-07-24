@@ -20,7 +20,7 @@ export default function CartScreen() {
   const { items, subtotal, totalQuantity, increment, decrement, remove } =
     useCart();
 
-  const discount = 10;
+  const discount = 0;
   const grandTotal = subtotal - discount;
 
   return (
@@ -72,7 +72,7 @@ export default function CartScreen() {
                 image={item.image ?? ""}
                 quantity={item.quantity}
                 onInc={() => increment(item.id)}
-                onDec={() => decrement(item.id)}
+                onDec={() => decrement(item.id, 1)}
                 onRemove={() => remove(item.id)}
               />
             ))}
@@ -159,7 +159,7 @@ function CartItem({
 
         <View className="h-12 min-w-[86px] flex-row items-center justify-center overflow-hidden rounded-full border border-primary">
           <TouchableOpacity
-            onPress={quantity < 2 ? undefined : onDec}
+            onPress={onDec}
             disabled={quantity < 2}
             className={cn(
               "h-full flex-1 items-center justify-center pl-2.5",

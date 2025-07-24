@@ -19,7 +19,7 @@ type State = { items: Record<string, CartItem> };
 type Action =
   | { type: "ADD"; payload: Omit<CartItem, "quantity">; quantity?: number }
   | { type: "INCREMENT"; id: string }
-  | { type: "DECREMENT"; id: string }
+  | { type: "DECREMENT"; id: string; floor?: number }
   | { type: "REMOVE"; id: string }
   | { type: "CLEAR" };
 
@@ -51,14 +51,30 @@ function reducer(state: State, action: Action): State {
     case "DECREMENT": {
       const item = state.items[action.id];
       if (!item) return state;
-      const qty = item.quantity - 1;
-      const items = { ...state.items };
-      if (qty <= 0) {
-        delete items[action.id];
-        return { items };
+
+      const floor = action.floor ?? 0;
+      const nextQty = item.quantity - 1;
+
+      if (nextQty < floor) {
+        if (floor === 0) {
+          const items = { ...state.items };
+          delete items[action.id];
+          return { items };
+        }
+        return {
+          items: {
+            ...state.items,
+            [action.id]: { ...item, quantity: floor },
+          },
+        };
       }
-      items[action.id] = { ...item, quantity: qty };
-      return { items };
+
+      return {
+        items: {
+          ...state.items,
+          [action.id]: { ...item, quantity: nextQty },
+        },
+      };
     }
     case "REMOVE": {
       const items = { ...state.items };
@@ -87,7 +103,8 @@ function buildApi(state: State, dispatch: React.Dispatch<Action>) {
     addItem: (item: Omit<CartItem, "quantity">, quantity = 1) =>
       dispatch({ type: "ADD", payload: item, quantity }),
     increment: (id: string) => dispatch({ type: "INCREMENT", id }),
-    decrement: (id: string) => dispatch({ type: "DECREMENT", id }),
+    decrement: (id: string, floor = 0) =>
+      dispatch({ type: "DECREMENT", id, floor }),
     remove: (id: string) => dispatch({ type: "REMOVE", id }),
     clear: () => dispatch({ type: "CLEAR" }),
     getQty: (id: string) => state.items[id]?.quantity ?? 0,
