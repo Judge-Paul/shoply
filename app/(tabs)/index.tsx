@@ -9,11 +9,12 @@ import {
   RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Search, SlidersHorizontal } from "lucide-react-native";
+import { Minus, Plus, Search, SlidersHorizontal } from "lucide-react-native";
 import cn from "@utils/cn";
 import { router } from "expo-router";
 import useProducts, { Product } from "hooks/useProducts";
 import SadDog from "@assets/sad-dog.png";
+import { useCart } from "context/CartContext";
 
 const categories = ["All", "Men", "Women", "Kids Wear"];
 
@@ -25,6 +26,83 @@ export default function Home() {
     refetch,
     isRefetching,
   } = useProducts();
+
+  const { getQty, addItem, increment, decrement } = useCart();
+
+  function renderProduct({ item }: { item: Product }) {
+    const id = String(item.id);
+    const quantity = getQty(id);
+    return (
+      <View className="mb-4 w-[48%] justify-between rounded-xl bg-white p-2 shadow-sm">
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() =>
+            router.push({
+              pathname: `/product/${item.id}`,
+              params: {
+                title: item.title,
+                price: item.price.toString(),
+                image: item.images[0],
+              },
+            })
+          }
+        >
+          <Image
+            source={{ uri: item.images[0] }}
+            className="h-40 w-full rounded-t-lg"
+            resizeMode="cover"
+          />
+          <Text
+            className="mt-2 text-sm font-semibold"
+            numberOfLines={2}
+            lineBreakMode="tail"
+          >
+            {item.title}
+          </Text>
+          <Text className="mt-1 text-base font-bold">{item.displayPrice}</Text>
+        </TouchableOpacity>
+
+        <View className="mt-2">
+          {quantity > 0 ? (
+            <View className="h-10 flex-row items-center justify-between rounded-full px-2">
+              <TouchableOpacity
+                onPress={() => decrement(id, 0)}
+                className="rounded-full bg-primary p-1.5"
+              >
+                <Minus size={18} color="white" />
+              </TouchableOpacity>
+              <Text className="text-sm font-medium">{quantity}</Text>
+              <TouchableOpacity
+                onPress={() => increment(id)}
+                className="rounded-full bg-primary p-1.5"
+              >
+                <Plus size={18} color="white" />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              onPress={() =>
+                addItem(
+                  {
+                    id,
+                    title: item.title,
+                    price: item.price,
+                    image: item.images[0],
+                  },
+                  1,
+                )
+              }
+              className="flex-row items-center justify-center rounded-full bg-primary py-2"
+            >
+              <Text className="ml-2 text-sm font-semibold text-white">
+                Add to Cart
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView className="bg-background flex-1">
@@ -140,43 +218,6 @@ function ListHeader() {
         </TouchableOpacity>
       </View>
     </View>
-  );
-}
-
-function renderProduct({ item }: { item: Product }) {
-  return (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      onPress={() =>
-        router.push({
-          pathname: `/product/${item.id}`,
-          params: {
-            title: item.title,
-            price: item.price.toString(),
-            image: item.images[0],
-          },
-        })
-      }
-      className="mb-4 w-[48%] justify-between rounded-xl bg-white p-2 shadow-sm"
-    >
-      <View>
-        <Image
-          source={{ uri: item.images[0] }}
-          className="h-40 w-full rounded-t-lg"
-          resizeMode="cover"
-        />
-        <View className="mt-2 flex-row items-center justify-between">
-          <Text
-            className="text-sm font-semibold"
-            numberOfLines={2}
-            lineBreakMode="tail"
-          >
-            {item.title}
-          </Text>
-        </View>
-      </View>
-      <Text className="mt-1.5 text-base font-bold">{item.displayPrice}</Text>
-    </TouchableOpacity>
   );
 }
 
