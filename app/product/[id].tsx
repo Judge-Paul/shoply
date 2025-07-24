@@ -108,7 +108,7 @@ export default function ProductDetail() {
           <Heart size={22} color="gray" />
         </TouchableOpacity> */}
         <TouchableOpacity
-          activeOpacity={0.8}
+          activeOpacity={0.7}
           className="h-14 flex-1 flex-row items-center justify-center gap-3 rounded-full bg-primary"
         >
           <ShoppingCart size={20} color="white" />
