@@ -136,7 +136,16 @@ function renderProduct({ item }: { item: Product }) {
   return (
     <TouchableOpacity
       activeOpacity={0.7}
-      onPress={() => router.push(`/product/${item.id}`)}
+      onPress={() =>
+        router.push({
+          pathname: `/product/${item.id}`,
+          params: {
+            title: item.title,
+            price: item.price.toString(),
+            image: item.image,
+          },
+        })
+      }
       className="mb-4 w-[48%] justify-between rounded-xl bg-white p-2 shadow-sm"
     >
       <View>
@@ -155,12 +164,7 @@ function renderProduct({ item }: { item: Product }) {
           </Text>
         </View>
       </View>
-      <Text className="mt-1.5 text-base font-bold">
-        {`₦ `}
-        {(item.price * 1550).toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-        })}
-      </Text>
+      <Text className="mt-1.5 text-base font-bold">{item.displayPrice}</Text>
     </TouchableOpacity>
   );
 }

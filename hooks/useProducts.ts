@@ -5,6 +5,7 @@ export interface Product {
   id: number;
   title: string;
   price: number;
+  displayPrice: string;
   description: string;
   category: string;
   image: string;
@@ -20,7 +21,13 @@ export default function useProducts() {
     queryFn: async () => {
       const res = await api.get<Product[]>("/products");
 
-      return res.data;
+      const data = res.data.map((product) => ({
+        ...product,
+        displayPrice: `₦ ${(product.price * 1550).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+        })}`,
+      }));
+      return data;
     },
     meta: {
       errMessage: "Failed to get products.",

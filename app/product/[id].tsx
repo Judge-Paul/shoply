@@ -6,37 +6,31 @@ import {
   TouchableOpacity,
   Animated,
   Easing,
+  Platform,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-  ChevronLeft,
-  Plus,
-  Minus,
-  ShoppingCart,
-  Heart,
-} from "lucide-react-native";
+import { ChevronLeft, Plus, Minus, ShoppingCart } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useRef, useEffect } from "react";
-import cn from "@utils/cn";
+import useProduct from "hooks/useProduct";
+import SadDog from "@assets/sad-dog.png";
+import { BlurView } from "expo-blur";
 
-const sizes = ["S", "M", "L", "XL"];
+// const sizes = ["S", "M", "L", "XL"]; // Commented out as requested
 
 export default function ProductDetail() {
-  const { id } = useLocalSearchParams();
+  const { id, title, price, image } = useLocalSearchParams();
   const router = useRouter();
 
-  const product = {
-    id,
-    image:
-      "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?_gl=1*69868j*_ga*MTgzODk2ODY0NC4xNzUzMzA2NTA1*_ga_8JE65Q40S6*czE3NTMzMDY1MDQkbzEkZzEkdDE3NTMzMDY1MTEkajUzJGwwJGgw",
-    title: "Dennis Lingo",
-    price: "$250",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Orci, sem feugiat ut nullam nisl orci, volutpat, felis...",
-    rating: 4.5,
-  };
+  const { product, isError } = useProduct(id, {
+    initialTitle: Array.isArray(title) ? title[0] : title,
+    initialPrice: price
+      ? parseFloat(Array.isArray(price) ? price[0] : price)
+      : undefined,
+    initialImage: Array.isArray(image) ? image[0] : image,
+  });
 
-  const [selectedSize, setSelectedSize] = useState("M");
+  // const [selectedSize, setSelectedSize] = useState("M"); // Commented out sizes feature
   const [quantity, setQuantity] = useState(0);
 
   const handleAddToCart = () => {
@@ -118,64 +112,110 @@ export default function ProductDetail() {
     }
   }, [quantity]);
 
+  if (!product && isError) {
+    return (
+      <SafeAreaView className="flex-1">
+        <View className="flex-row items-center justify-between px-4">
+          <TouchableOpacity onPress={() => router.back()}>
+            <ChevronLeft size={35} color="black" />
+          </TouchableOpacity>
+          <Text className="text-xl font-bold">Product Details</Text>
+          <View className="w-9" />
+        </View>
+        <View className="flex-1 items-center justify-center px-4">
+          <Image source={SadDog} className="aspect-square h-60" />
+          <Text className="mt-4 text-center text-xl font-semibold">
+            Failed to load product
+          </Text>
+          <Text className="mt-2 w-2/3 text-center text-gray-600">
+            Something went wrong while loading the product details.
+          </Text>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            className="mt-6 w-2/3 items-center rounded-full bg-primary px-6 py-3"
+          >
+            <Text className="font-semibold text-white">Go Back</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <View className="flex-row items-center justify-between px-4">
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={35} color="black" />
-        </TouchableOpacity>
-        <Text className="text-xl font-bold">Product Details</Text>
-        <View className="w-9" />
+      <View className="absolute left-0 right-0 top-0 z-10">
+        <BlurView
+          intensity={50}
+          tint="light"
+          className="px-4 py-3"
+          style={{
+            paddingTop: Platform.OS === "ios" ? 50 : 25,
+          }}
+        >
+          <View className="flex-row items-center justify-between">
+            <TouchableOpacity onPress={() => router.back()}>
+              <ChevronLeft size={35} color="black" />
+            </TouchableOpacity>
+            <Text className="text-xl font-bold">Product Details</Text>
+            <View className="w-9" />
+          </View>
+        </BlurView>
       </View>
-      <ScrollView className="px-4" showsVerticalScrollIndicator={false}>
-        <View className="mb-6 overflow-hidden rounded-b-3xl bg-gray-100">
-          <Image
-            source={{ uri: product.image }}
-            className="h-80 w-full"
-            resizeMode="contain"
-          />
+      <ScrollView className="px-4 pt-12" showsVerticalScrollIndicator={false}>
+        <View className="mb-6 overflow-hidden rounded-b-3xl bg-gray-200">
+          {/* Show loading indicator over image if still loading */}
+          {/* {isLoading && (
+            <View className="absolute inset-0 z-10 items-center justify-center bg-gray-200 bg-opacity-75">
+              <ActivityIndicator size="large" color="#007AFF" />
+            </View>
+          )} */}
+          {!product?.image ? (
+            <View className="h-80 w-full animate-pulse" />
+          ) : (
+            <Image
+              source={{ uri: product.image }}
+              className="h-80 w-full"
+              // resizeMode="contain"
+            />
+          )}
         </View>
 
         <View className="flex flex-row items-start justify-between">
-          <View>
-            <Text className="text-2xl font-semibold">{product.title}</Text>
-            <Text className="mt-1 text-xl font-bold">{product.price}</Text>
+          <View className="flex-1">
+            {!product?.title ? (
+              <View className="flex-col gap-2">
+                <View className="h-6 w-full animate-pulse rounded-full bg-gray-200" />
+                <View className="h-6 w-full animate-pulse rounded-full bg-gray-200" />
+              </View>
+            ) : (
+              <Text className="text-2xl">{product.title}</Text>
+            )}
+            {!product?.displayPrice ? (
+              <View className="mt-4 h-6 w-1/3 animate-pulse rounded-full bg-gray-200" />
+            ) : (
+              <Text className="mt-4 text-xl font-bold">
+                {product.displayPrice}
+              </Text>
+            )}
           </View>
         </View>
 
         <Text className="mb-2 mt-5 border-t-[1.5px] border-gray-200 pt-5 text-lg font-bold">
           Description
         </Text>
-        <Text className="text-sm leading-relaxed text-gray-600">
-          {product.description}
-          <Text className="text-blue-500"> Read More</Text>
-        </Text>
 
-        <Text className="mb-2 mt-5 border-t-[1.5px] border-gray-200 pt-5 text-lg font-bold">
-          Select Size
-        </Text>
-        <View className="flex-row gap-2.5">
-          {sizes.map((size) => (
-            <TouchableOpacity
-              key={size}
-              onPress={() => setSelectedSize(size)}
-              activeOpacity={0.7}
-              className={cn(
-                "rounded-full bg-gray-100 px-5 py-3.5",
-                selectedSize === size && "bg-primary text-white",
-              )}
-            >
-              <Text
-                className={cn(
-                  "text-sm text-gray-700",
-                  selectedSize === size && "text-white",
-                )}
-              >
-                {size}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        {!product?.description ? (
+          <View className="flex-col gap-1.5">
+            <View className="h-4 w-full animate-pulse rounded-full bg-gray-200" />
+            <View className="h-4 w-full animate-pulse rounded-full bg-gray-200" />
+            <View className="h-4 w-full animate-pulse rounded-full bg-gray-200" />
+            <View className="h-4 w-full animate-pulse rounded-full bg-gray-200" />
+          </View>
+        ) : (
+          <Text className="text-sm leading-relaxed text-gray-600">
+            {product.description}
+          </Text>
+        )}
       </ScrollView>
 
       <View className="flex-row items-center justify-between px-4 py-4">

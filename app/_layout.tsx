@@ -17,7 +17,7 @@ const client = new QueryClient({
   queryCache: new QueryCache({
     onError: (error, query) => {
       const errMessage =
-        (query.meta?.errorMessage as string) || "An error occurred";
+        (query.meta?.errMessage as string) || "An error occurred";
       const errDescription =
         (query.meta?.errDescription as string) ||
         "Please, check your internet connection.";
