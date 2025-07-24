@@ -4,7 +4,8 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
-  Pressable,
+  Animated,
+  Easing,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -15,7 +16,7 @@ import {
   Heart,
 } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import cn from "@utils/cn";
 
 const sizes = ["S", "M", "L", "XL"];
@@ -36,7 +37,86 @@ export default function ProductDetail() {
   };
 
   const [selectedSize, setSelectedSize] = useState("M");
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(0);
+
+  const handleAddToCart = () => {
+    setQuantity(1);
+  };
+
+  const handleIncrement = () => {
+    setQuantity((prev) => prev + 1);
+  };
+
+  const handleDecrement = () => {
+    setQuantity((prev) => {
+      const next = prev - 1;
+      return next >= 0 ? next : 0;
+    });
+  };
+
+  const addToCartWidth = useRef(new Animated.Value(1)).current;
+  const addToCartOpacity = useRef(new Animated.Value(1)).current;
+  const contentOpacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(10)).current;
+
+  const interpolatedWidth = addToCartWidth.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0%", "100%"],
+  });
+
+  useEffect(() => {
+    if (quantity === 1) {
+      Animated.parallel([
+        Animated.timing(addToCartWidth, {
+          toValue: 0,
+          duration: 200,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: false,
+        }),
+        Animated.timing(addToCartOpacity, {
+          toValue: 0,
+          duration: 200,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: false,
+        }),
+        Animated.timing(contentOpacity, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else if (quantity === 0) {
+      Animated.parallel([
+        Animated.timing(addToCartWidth, {
+          toValue: 1,
+          duration: 200,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: false,
+        }),
+        Animated.timing(addToCartOpacity, {
+          toValue: 1,
+          duration: 200,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: false,
+        }),
+        Animated.timing(contentOpacity, {
+          toValue: 0,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: 10,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [quantity]);
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -59,26 +139,21 @@ export default function ProductDetail() {
         <View className="flex flex-row items-start justify-between">
           <View>
             <Text className="text-2xl font-semibold">{product.title}</Text>
-            <Text className="mb-4 mt-1 text-xl font-bold">{product.price}</Text>
-          </View>
-          <View className="flex-row items-center gap-4 rounded-full border border-gray-300 px-3 py-3.5">
-            <Pressable onPress={() => setQuantity(Math.max(1, quantity - 1))}>
-              <Minus size={20} color="gray" />
-            </Pressable>
-            <Text className="text-base text-gray-700">{quantity}</Text>
-            <Pressable onPress={() => setQuantity(quantity + 1)}>
-              <Plus size={20} color="gray" />
-            </Pressable>
+            <Text className="mt-1 text-xl font-bold">{product.price}</Text>
           </View>
         </View>
 
-        <Text className="mb-2 text-lg font-bold">Description</Text>
+        <Text className="mb-2 mt-5 border-t-[1.5px] border-gray-200 pt-5 text-lg font-bold">
+          Description
+        </Text>
         <Text className="text-sm leading-relaxed text-gray-600">
           {product.description}
           <Text className="text-blue-500"> Read More</Text>
         </Text>
 
-        <Text className="mb-2 mt-6 text-lg font-bold">Select Size</Text>
+        <Text className="mb-2 mt-5 border-t-[1.5px] border-gray-200 pt-5 text-lg font-bold">
+          Select Size
+        </Text>
         <View className="flex-row gap-2.5">
           {sizes.map((size) => (
             <TouchableOpacity
@@ -104,16 +179,66 @@ export default function ProductDetail() {
       </ScrollView>
 
       <View className="flex-row items-center justify-between px-4 py-4">
-        {/* <TouchableOpacity className="h-12 w-12 items-center justify-center rounded-full border border-gray-300">
-          <Heart size={22} color="gray" />
-        </TouchableOpacity> */}
-        <TouchableOpacity
-          activeOpacity={0.7}
-          className="h-14 flex-1 flex-row items-center justify-center gap-3 rounded-full bg-primary"
+        <Animated.View
+          style={{
+            width: interpolatedWidth,
+            opacity: addToCartOpacity,
+            overflow: "hidden",
+          }}
         >
-          <ShoppingCart size={20} color="white" />
-          <Text className="text-sm font-semibold text-white">Add to Cart</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={handleAddToCart}
+            className="h-14 w-full flex-row items-center justify-center gap-3 rounded-full bg-primary"
+          >
+            <ShoppingCart size={20} color="white" />
+            <Text className="text-sm font-semibold text-white">
+              Add to Cart
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
+
+        {quantity > 0 && (
+          <Animated.View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              opacity: contentOpacity,
+              transform: [{ translateY }],
+              marginLeft: 12,
+              flex: 1,
+            }}
+          >
+            <View className="h-14 w-1/3 flex-row items-center justify-center overflow-hidden rounded-full border border-primary">
+              <TouchableOpacity
+                onPress={handleDecrement}
+                className="h-full flex-1 items-center justify-center"
+              >
+                <Minus size={20} color="gray" />
+              </TouchableOpacity>
+              <Text className="px-0.5 text-center text-sm font-medium">
+                {quantity}
+              </Text>
+              <TouchableOpacity
+                onPress={handleIncrement}
+                className="h-full flex-1 items-center justify-center"
+              >
+                <Plus size={20} color="gray" />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => router.push("/cart")}
+              className="ml-2 h-14 flex-1 flex-row items-center justify-center gap-3 rounded-full bg-primary"
+            >
+              <ShoppingCart size={20} color="white" />
+              <Text className="text-sm font-semibold text-white">
+                Go to Cart
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
+        )}
       </View>
     </SafeAreaView>
   );
