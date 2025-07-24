@@ -29,6 +29,7 @@ export default function useProduct(
   const product = query.data
     ? {
         ...query.data,
+        image: query.data.images[0],
         displayPrice: convertToNaira(query.data.price),
       }
     : options &&

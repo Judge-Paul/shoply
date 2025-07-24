@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 
-const baseURL = "https://fakestoreapi.com";
+const baseURL = "https://api.escuelajs.co/api/v1";
 
 type Config = AxiosRequestConfig<object>;
 

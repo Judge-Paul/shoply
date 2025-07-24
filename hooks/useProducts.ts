@@ -5,15 +5,21 @@ import { convertToNaira } from "@utils/currency";
 export interface Product {
   id: number;
   title: string;
+  slug: string;
   price: number;
-  displayPrice: string;
+  displayPrice?: string;
   description: string;
-  category: string;
-  image: string;
-  rating: {
-    rate: number;
-    count: number;
+  category: {
+    id: number;
+    name: string;
+    slug: string;
+    image: string;
+    creationAt: string;
+    updatedAt: string;
   };
+  images: string[];
+  creationAt: string;
+  updatedAt: string;
 }
 
 export default function useProducts() {
@@ -22,7 +28,7 @@ export default function useProducts() {
     queryFn: async () => {
       const res = await api.get<Product[]>("/products");
 
-      const data = res.data.map((product) => ({
+      const data = res.data.slice(0, 14).map((product) => ({
         ...product,
         displayPrice: convertToNaira(product.price),
       }));
