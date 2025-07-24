@@ -15,6 +15,7 @@ import { router } from "expo-router";
 import useProducts, { Product } from "hooks/useProducts";
 import SadDog from "@assets/sad-dog.png";
 import { useCart } from "context/CartContext";
+import useCategories from "hooks/useCategories";
 
 const categories = ["All", "Men", "Women", "Kids Wear"];
 
@@ -159,16 +160,21 @@ export default function Home() {
 }
 
 function ListHeader() {
-  const [activeCategory, setActiveCategory] = useState(categories[0]);
+  const [activeCategory, setActiveCategory] = useState<number | null>(null);
+
+  const {
+    data: categories,
+    isPending: categoriesLoading,
+    isError: categoriesError,
+  } = useCategories();
 
   return (
     <View className="px-4">
       <View className="mt-4 flex-row items-center justify-between">
-        <Text className="text-lg text-gray-500">Hey 👋🏽</Text>
+        <Text className="mb-4 text-3xl font-bold text-gray-500">
+          Welcome 👋🏽
+        </Text>
       </View>
-
-      <Text className="mt-2 text-4xl font-bold">Let's find your</Text>
-      <Text className="mb-4 text-4xl font-extrabold">Exclusive Outfit</Text>
 
       <View className="h-16 flex-row items-center gap-2.5 space-x-3">
         <View className="h-full flex-1 flex-row items-center space-x-2 rounded-xl bg-gray-100 px-4 py-3">
@@ -189,26 +195,53 @@ function ListHeader() {
 
       <Text className="mb-2 mt-6 text-lg font-bold">Top Categories</Text>
       <View className="flex-row gap-3 space-x-3">
-        {categories.map((cat) => (
-          <TouchableOpacity
-            key={cat}
-            onPress={() => setActiveCategory(cat)}
-            activeOpacity={0.7}
-            className={cn(
-              "rounded-full bg-gray-100 px-6 py-3",
-              activeCategory === cat && "bg-primary text-white",
+        {categoriesLoading ? (
+          <View className="flex-row gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <View key={i} className="items-center">
+                <View className="h-24 w-24 animate-pulse rounded-xl bg-gray-200" />
+                <View className="mt-2 h-4 w-12 animate-pulse rounded bg-gray-200" />
+              </View>
+            ))}
+          </View>
+        ) : categoriesError || !categories || categories.length === 0 ? (
+          <View className="w=full h-24 flex-1 items-center justify-center">
+            <Text>No categories available.</Text>
+          </View>
+        ) : (
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={categories}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={{ paddingRight: 16 }}
+            ItemSeparatorComponent={() => <View className="w-4" />}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => setActiveCategory(item.id)}
+                className="items-center"
+                activeOpacity={0.8}
+              >
+                <Image
+                  source={{ uri: item.image }}
+                  className={cn(
+                    "h-24 w-24 rounded-xl",
+                    activeCategory === item.id && "opacity-90",
+                  )}
+                  resizeMode="cover"
+                />
+                <Text
+                  className={cn(
+                    "mt-2 text-center text-sm font-medium text-gray-700",
+                    activeCategory === item.id && "text-primary",
+                  )}
+                >
+                  {item.name}
+                </Text>
+              </TouchableOpacity>
             )}
-          >
-            <Text
-              className={cn(
-                "text-sm text-gray-700",
-                activeCategory === cat && "text-white",
-              )}
-            >
-              {cat}
-            </Text>
-          </TouchableOpacity>
-        ))}
+          />
+        )}
       </View>
 
       <View className="mb-3 mt-6 flex-row items-center justify-between">
