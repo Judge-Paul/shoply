@@ -39,7 +39,6 @@ export default function Products() {
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={() =>
-            // navigate to /product/[id]?title=…&price=…&image=…
             router.push({
               pathname: `/product/${item.id}`,
               params: {

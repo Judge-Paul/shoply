@@ -17,8 +17,6 @@ import SadDog from "assets/sad-dog.png";
 import { BlurView } from "expo-blur";
 import { useCart } from "context/CartContext";
 
-// const sizes = ["S", "M", "L", "XL"]; // Commented out as requested
-
 export default function ProductDetail() {
   const { id, title, price, image } = useLocalSearchParams();
   const productId = Array.isArray(id) ? id[0] : (id as string);

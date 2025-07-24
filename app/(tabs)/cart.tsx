@@ -6,8 +6,15 @@ import {
   ScrollView,
   Image,
   Platform,
+  Modal,
 } from "react-native";
-import { ChevronLeft, Trash2, Minus, Plus } from "lucide-react-native";
+import {
+  ChevronLeft,
+  Trash2,
+  Minus,
+  Plus,
+  ShoppingCart,
+} from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
@@ -32,6 +39,7 @@ export default function CartScreen() {
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [applied, setApplied] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const applyPromo = () => {
     if (applied && promoCode === "2025") return;
@@ -55,7 +63,22 @@ export default function CartScreen() {
     }
   };
 
+  const handleCheckout = () => {
+    setShowSuccessModal(true);
+  };
+
+  const handleOrderSuccess = () => {
+    clear();
+    setApplied(false);
+    setDiscount(0);
+    setPromoCode("");
+    setShowSuccessModal(false);
+
+    router.push("/");
+  };
+
   const grandTotal = subtotal - discount;
+
   return (
     <SafeAreaView className="flex-1 bg-[#f9fafb]">
       <View className="absolute left-0 right-0 top-0 z-10 pt-1">
@@ -155,7 +178,10 @@ export default function CartScreen() {
               </View>
             </View>
 
-            <TouchableOpacity className="mt-6 rounded-full bg-primary py-4">
+            <TouchableOpacity
+              onPress={handleCheckout}
+              className="mt-6 rounded-full bg-primary py-4"
+            >
               <Text className="text-center text-base font-bold text-white">
                 Checkout
               </Text>
@@ -163,6 +189,46 @@ export default function CartScreen() {
           </View>
         </>
       )}
+
+      <Modal
+        visible={showSuccessModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowSuccessModal(false)}
+      >
+        <BlurView
+          intensity={25}
+          tint="dark"
+          className="flex-1 items-center justify-center px-6"
+        >
+          <View className="w-full max-w-sm rounded-3xl bg-white p-8 shadow-2xl">
+            <View className="mb-6 items-center">
+              <View className="h-20 w-20 items-center justify-center rounded-full bg-primary">
+                <ShoppingCart size={32} color="white" />
+              </View>
+            </View>
+
+            <View className="mb-8 items-center">
+              <Text className="mb-2 text-xl font-bold text-gray-900">
+                Order Placed Successfully
+              </Text>
+              <Text className="text-center text-gray-600">
+                You order has been placed successfully. {"\n"}We'll reach out to
+                you on next steps.
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              onPress={handleOrderSuccess}
+              className="rounded-full bg-primary py-4"
+            >
+              <Text className="text-center text-base font-semibold text-white">
+                Back to shopping
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </BlurView>
+      </Modal>
     </SafeAreaView>
   );
 }
