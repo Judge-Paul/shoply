@@ -58,10 +58,12 @@ export default function Home() {
           >
             {item.title}
           </Text>
-          <Text className="mt-1 text-base font-bold">{item.displayPrice}</Text>
+          <Text className="mb-2 mt-1 text-base font-bold">
+            {item.displayPrice}
+          </Text>
         </TouchableOpacity>
 
-        <View className="mt-2">
+        <View className="mt-auto">
           {quantity > 0 ? (
             <View className="h-10 flex-row items-center justify-between rounded-full px-2">
               <TouchableOpacity
