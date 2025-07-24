@@ -10,6 +10,7 @@ import {
   NotifierComponents,
 } from "react-native-notifier";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { CartProvider } from "context/CartContext";
 
 import "./global.css";
 
@@ -39,10 +40,12 @@ export default function RootLayout() {
     <QueryClientProvider client={client}>
       <GestureHandlerRootView>
         <NotifierWrapper>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="product" options={{ headerShown: false }} />
-          </Stack>
+          <CartProvider>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="product" options={{ headerShown: false }} />
+            </Stack>
+          </CartProvider>
         </NotifierWrapper>
       </GestureHandlerRootView>
     </QueryClientProvider>

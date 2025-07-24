@@ -11,12 +11,17 @@ import { ChevronLeft, Trash2, Minus, Plus } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
-import { useState } from "react";
+import SadDog from "@assets/sad-dog.png";
+import { useCart } from "context/CartContext";
+import { convertToNaira } from "@utils/currency";
+import cn from "@utils/cn";
 
 export default function CartScreen() {
-  const itemTotal = 730;
-  const discount = 50;
-  const grandTotal = itemTotal - discount;
+  const { items, subtotal, totalQuantity, increment, decrement, remove } =
+    useCart();
+
+  const discount = 10;
+  const grandTotal = subtotal - discount;
 
   return (
     <SafeAreaView className="flex-1 bg-[#f9fafb]">
@@ -25,9 +30,7 @@ export default function CartScreen() {
           intensity={50}
           tint="light"
           className="px-4 py-3"
-          style={{
-            paddingTop: Platform.OS === "ios" ? 50 : 25,
-          }}
+          style={{ paddingTop: Platform.OS === "ios" ? 50 : 25 }}
         >
           <View className="flex-row items-center justify-between">
             <TouchableOpacity onPress={() => router.back()}>
@@ -39,87 +42,103 @@ export default function CartScreen() {
         </BlurView>
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        className="px-4 pt-16"
-        contentContainerClassName="pb-80"
-      >
-        <CartItem
-          title="Dennis Lingo"
-          size="L"
-          price={250}
-          image="https://i.pravatar.cc/150?img=12"
-        />
-        <CartItem
-          title="Red Cotton Shirt"
-          size="L"
-          price={200}
-          image="https://i.pravatar.cc/150?img=5"
-        />
-        <CartItem
-          title="Leather Jacket"
-          size="L"
-          price={280}
-          image="https://i.pravatar.cc/150?img=8"
-        />
-      </ScrollView>
-
-      <View className="absolute bottom-0 left-0 right-0 rounded-t-3xl bg-white px-6 py-5 shadow-2xl">
-        <View className="flex-row items-center rounded-full bg-gray-100 pl-5">
-          <TextInput
-            className="flex-1 text-base text-gray-500"
-            placeholder="Enter Promocode"
-            placeholderTextColor="#b0b0b0"
-          />
-          <TouchableOpacity className="rounded-full bg-primary px-10 py-5">
-            <Text className="text-sm font-semibold text-white">Apply</Text>
+      {items.length === 0 ? (
+        <View className="flex-1 items-center justify-center px-6 pt-20">
+          <Image source={SadDog} className="h-48 w-48" resizeMode="contain" />
+          <Text className="mt-4 text-xl font-semibold">Your cart is empty</Text>
+          <Text className="mt-2 text-center text-gray-500">
+            Looks like you haven't added anything yet.
+          </Text>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            className="mt-6 rounded-full bg-primary px-8 py-4"
+          >
+            <Text className="font-semibold text-white">Start shopping</Text>
           </TouchableOpacity>
         </View>
+      ) : (
+        <>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            className="px-4 pt-16"
+            contentContainerClassName="pb-80"
+          >
+            {items.map((item) => (
+              <CartItem
+                key={item.id}
+                id={item.id}
+                title={item.title}
+                price={item.price}
+                image={item.image ?? ""}
+                quantity={item.quantity}
+                onInc={() => increment(item.id)}
+                onDec={() => decrement(item.id)}
+                onRemove={() => remove(item.id)}
+              />
+            ))}
+          </ScrollView>
 
-        <View className="mt-3 gap-2">
-          <View className="flex-row justify-between">
-            <Text className="text-gray-500">Item Total</Text>
-            <Text className="font-medium">${itemTotal}</Text>
+          <View className="absolute bottom-0 left-0 right-0 rounded-t-3xl bg-white px-6 py-5 shadow-2xl">
+            <View className="flex-row items-center rounded-full bg-gray-100 pl-5">
+              <TextInput
+                className="flex-1 text-base text-gray-500"
+                placeholder="Enter Promocode"
+                placeholderTextColor="#b0b0b0"
+              />
+              <TouchableOpacity className="rounded-full bg-primary px-10 py-5">
+                <Text className="text-sm font-semibold text-white">Apply</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View className="mt-3 gap-2">
+              <View className="flex-row justify-between">
+                <Text className="text-gray-500">Items ({totalQuantity})</Text>
+                <Text className="font-medium">{convertToNaira(subtotal)}</Text>
+              </View>
+              <View className="flex-row justify-between">
+                <Text className="text-gray-500">Discount</Text>
+                <Text className="font-medium">-${discount.toFixed(2)}</Text>
+              </View>
+              <View className="mt-2 flex-row justify-between border-t border-gray-200 pt-2">
+                <Text className="text-lg font-bold">Grand Total</Text>
+                <Text className="text-lg font-bold">
+                  {convertToNaira(grandTotal)}
+                </Text>
+              </View>
+            </View>
+
+            <TouchableOpacity className="mt-6 rounded-full bg-primary py-4">
+              <Text className="text-center text-base font-bold text-white">
+                Checkout
+              </Text>
+            </TouchableOpacity>
           </View>
-          <View className="flex-row justify-between">
-            <Text className="text-gray-500">Discount</Text>
-            <Text className="font-medium">-${discount}</Text>
-          </View>
-          <View className="mt-2 flex-row justify-between border-t border-gray-200 pt-2">
-            <Text className="text-lg font-bold">Grand Total</Text>
-            <Text className="text-lg font-bold">${grandTotal}</Text>
-          </View>
-        </View>
-        <TouchableOpacity className="mt-6 rounded-full bg-primary py-4">
-          <Text className="text-center text-base font-bold text-white">
-            Checkout
-          </Text>
-        </TouchableOpacity>
-      </View>
+        </>
+      )}
     </SafeAreaView>
   );
 }
 
 type CartItemProps = {
+  id: string;
   title: string;
-  size: string;
   price: number;
   image: string;
+  quantity: number;
+  onInc: () => void;
+  onDec: () => void;
+  onRemove: () => void;
 };
 
-export function CartItem({ title, size, price, image }: CartItemProps) {
-  const [quantity, setQuantity] = useState(0);
-
-  const handleIncrement = () => {
-    setQuantity((prev) => prev + 1);
-  };
-
-  const handleDecrement = () => {
-    setQuantity((prev) => {
-      const next = prev - 1;
-      return next >= 0 ? next : 0;
-    });
-  };
+function CartItem({
+  title,
+  price,
+  image,
+  quantity,
+  onInc,
+  onDec,
+  onRemove,
+}: CartItemProps) {
   return (
     <View className="mb-4 flex-row items-center justify-between rounded-2xl bg-white p-4 shadow">
       <Image
@@ -128,20 +147,24 @@ export function CartItem({ title, size, price, image }: CartItemProps) {
         resizeMode="contain"
       />
 
-      <View className="ju flex-1 px-3">
+      <View className="flex-1 px-3">
         <Text className="text-base font-semibold">{title}</Text>
-        <Text className="mt-1 text-lg font-bold">${price}</Text>
+        <Text className="mt-1 text-lg font-bold">{convertToNaira(price)}</Text>
       </View>
 
       <View className="items-end">
-        <TouchableOpacity className={`mb-2 rounded-full p-2`}>
+        <TouchableOpacity onPress={onRemove} className="mb-2 rounded-full p-2">
           <Trash2 size={20} color="#f87171" />
         </TouchableOpacity>
 
         <View className="h-12 min-w-[86px] flex-row items-center justify-center overflow-hidden rounded-full border border-primary">
           <TouchableOpacity
-            onPress={handleDecrement}
-            className="h-full flex-1 items-center justify-center pl-2.5"
+            onPress={quantity < 2 ? undefined : onDec}
+            disabled={quantity < 2}
+            className={cn(
+              "h-full flex-1 items-center justify-center pl-2.5",
+              quantity < 2 && "text-gray-100",
+            )}
           >
             <Minus size={20} color="gray" />
           </TouchableOpacity>
@@ -149,7 +172,7 @@ export function CartItem({ title, size, price, image }: CartItemProps) {
             {quantity}
           </Text>
           <TouchableOpacity
-            onPress={handleIncrement}
+            onPress={onInc}
             className="h-full flex-1 items-center justify-center pr-2.5"
           >
             <Plus size={20} color="gray" />

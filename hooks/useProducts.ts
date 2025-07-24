@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "@utils/api";
+import { convertToNaira } from "@utils/currency";
 
 export interface Product {
   id: number;
@@ -23,9 +24,7 @@ export default function useProducts() {
 
       const data = res.data.map((product) => ({
         ...product,
-        displayPrice: `₦ ${(product.price * 1550).toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-        })}`,
+        displayPrice: convertToNaira(product.price),
       }));
       return data;
     },

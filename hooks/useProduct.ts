@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "@utils/api";
 import { Product } from "./useProducts";
+import { convertToNaira } from "@utils/currency";
 
 interface UseProductOptions {
   initialTitle?: string;
@@ -28,9 +29,7 @@ export default function useProduct(
   const product = query.data
     ? {
         ...query.data,
-        displayPrice: `₦ ${(query.data.price * 1550).toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-        })}`,
+        displayPrice: convertToNaira(query.data.price),
       }
     : options &&
         (options.initialTitle || options.initialPrice || options.initialImage)
@@ -43,9 +42,7 @@ export default function useProduct(
           category: "",
           rating: { rate: 0, count: 0 },
           displayPrice: options.initialPrice
-            ? `₦ ${(options.initialPrice * 1550).toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-              })}`
+            ? convertToNaira(options.initialPrice)
             : "",
         }
       : null;

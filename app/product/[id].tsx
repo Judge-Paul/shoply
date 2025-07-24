@@ -13,16 +13,18 @@ import { ChevronLeft, Plus, Minus, ShoppingCart } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useRef, useEffect } from "react";
 import useProduct from "hooks/useProduct";
-import SadDog from "@assets/sad-dog.png";
+import SadDog from "assets/sad-dog.png";
 import { BlurView } from "expo-blur";
+import { useCart } from "context/CartContext";
 
 // const sizes = ["S", "M", "L", "XL"]; // Commented out as requested
 
 export default function ProductDetail() {
   const { id, title, price, image } = useLocalSearchParams();
-  const router = useRouter();
+  const productId = Array.isArray(id) ? id[0] : (id as string);
 
-  const { product, isError } = useProduct(id, {
+  const router = useRouter();
+  const { product, isError } = useProduct(productId, {
     initialTitle: Array.isArray(title) ? title[0] : title,
     initialPrice: price
       ? parseFloat(Array.isArray(price) ? price[0] : price)
@@ -30,23 +32,24 @@ export default function ProductDetail() {
     initialImage: Array.isArray(image) ? image[0] : image,
   });
 
-  // const [selectedSize, setSelectedSize] = useState("M"); // Commented out sizes feature
-  const [quantity, setQuantity] = useState(0);
+  const { addItem, increment, decrement, getQty } = useCart();
+  const quantity = getQty(productId);
 
   const handleAddToCart = () => {
-    setQuantity(1);
+    if (!product) return;
+    addItem(
+      {
+        id: productId,
+        title: product.title ?? "",
+        price: product.price ?? 0,
+        image: product.image,
+      },
+      1,
+    );
   };
 
-  const handleIncrement = () => {
-    setQuantity((prev) => prev + 1);
-  };
-
-  const handleDecrement = () => {
-    setQuantity((prev) => {
-      const next = prev - 1;
-      return next >= 0 ? next : 0;
-    });
-  };
+  const handleIncrement = () => increment(productId);
+  const handleDecrement = () => decrement(productId);
 
   const addToCartWidth = useRef(new Animated.Value(1)).current;
   const addToCartOpacity = useRef(new Animated.Value(1)).current;
