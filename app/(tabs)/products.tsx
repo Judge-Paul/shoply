@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -7,10 +7,9 @@ import {
   FlatList,
   RefreshControl,
   Platform,
-  TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ChevronLeft, Minus, Plus, Search, X } from "lucide-react-native";
+import { ChevronLeft, Minus, Plus } from "lucide-react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import useProducts, { Product } from "hooks/useProducts";
 import { useCart } from "context/CartContext";
@@ -18,49 +17,19 @@ import SadDog from "@assets/sad-dog.png";
 import { BlurView } from "expo-blur";
 
 export default function Products() {
-  const {
-    categorySlug,
-    categoryName,
-    searchQuery: initialSearchQuery,
-  } = useLocalSearchParams<{
+  const { categorySlug, categoryName } = useLocalSearchParams<{
     categorySlug: string;
     categoryName: string;
-    searchQuery: string;
   }>();
-
-  const [searchQuery, setSearchQuery] = useState(initialSearchQuery || "");
-  const [isSearching, setIsSearching] = useState(!!initialSearchQuery);
-
   const {
     data: products,
     isPending: loading,
     isError: error,
     refetch,
     isRefetching,
-  } = useProducts({
-    categorySlug,
-    searchQuery: isSearching ? searchQuery : undefined,
-  });
+  } = useProducts(categorySlug);
 
   const { getQty, addItem, increment, decrement } = useCart();
-
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      setIsSearching(true);
-    }
-  };
-
-  const clearSearch = () => {
-    setSearchQuery("");
-    setIsSearching(false);
-  };
-
-  const getPageTitle = () => {
-    if (isSearching && searchQuery) {
-      return `Search: ${searchQuery}`;
-    }
-    return categoryName || "All Products";
-  };
 
   function renderProduct({ item }: { item: Product }) {
     const id = String(item.id);
@@ -149,13 +118,6 @@ export default function Products() {
     );
   }
 
-  const getEmptyStateMessage = () => {
-    if (error) return "Failed to load products.";
-    if (isSearching && searchQuery)
-      return `No products found for "${searchQuery}".`;
-    return "No products found.";
-  };
-
   return (
     <SafeAreaView className="bg-background flex-1">
       <View className="absolute left-0 right-0 top-0 z-10">
@@ -171,37 +133,13 @@ export default function Products() {
             <TouchableOpacity onPress={() => router.back()}>
               <ChevronLeft size={35} color="black" />
             </TouchableOpacity>
-            <Text
-              className="flex-1 text-center text-xl font-bold"
-              numberOfLines={1}
-            >
-              {getPageTitle()}
+            <Text className="text-xl font-bold">
+              {categoryName || "All Products"}
             </Text>
             <View className="w-9" />
           </View>
-          <View className="mt-3 flex-row items-center space-x-2 rounded-xl bg-gray-100 px-4 py-3">
-            <TouchableOpacity onPress={handleSearch}>
-              <Search size={20} color="gray" />
-            </TouchableOpacity>
-            <TextInput
-              placeholder="Search products..."
-              className="flex-1 pl-3 text-gray-700"
-              placeholderTextColor="#aaa"
-              value={searchQuery}
-              defaultValue={initialSearchQuery}
-              onChangeText={setSearchQuery}
-              onSubmitEditing={handleSearch}
-              returnKeyType="search"
-            />
-            {(searchQuery || isSearching) && (
-              <TouchableOpacity onPress={clearSearch}>
-                <X size={20} color="gray" />
-              </TouchableOpacity>
-            )}
-          </View>
         </BlurView>
       </View>
-
       <FlatList
         data={
           error
@@ -217,8 +155,8 @@ export default function Products() {
               ? `skeleton-${i}`
               : products[i].id.toString()
         }
-        className="pt-28"
-        renderItem={loading ? renderSkeleton : renderProduct}
+        className="pt-12"
+        renderItem={error ? null : loading ? renderSkeleton : renderProduct}
         numColumns={2}
         columnWrapperStyle={{
           justifyContent: "space-between",
@@ -228,16 +166,8 @@ export default function Products() {
           <View className="items-center px-4 py-10">
             <Image source={SadDog} className="aspect-square h-60" />
             <Text className="mt-3 text-2xl font-semibold">
-              {getEmptyStateMessage()}
+              {error ? "Failed to load products." : "No products found."}
             </Text>
-            {isSearching && searchQuery && (
-              <TouchableOpacity
-                onPress={clearSearch}
-                className="mt-4 rounded-full bg-primary px-6 py-2"
-              >
-                <Text className="font-semibold text-white">Clear Search</Text>
-              </TouchableOpacity>
-            )}
           </View>
         }
         refreshControl={

@@ -18,8 +18,6 @@ import { useCart } from "context/CartContext";
 import useCategories from "hooks/useCategories";
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState("");
-
   const {
     data: products,
     isPending: productsLoading,
@@ -29,18 +27,6 @@ export default function Home() {
   } = useProducts();
 
   const { getQty, addItem, increment, decrement } = useCart();
-
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      router.push({
-        pathname: "/products",
-        params: {
-          searchQuery: searchQuery.trim(),
-        },
-      });
-      // setSearchQuery("");
-    }
-  };
 
   function renderProduct({ item }: { item: Product }) {
     const id = String(item.id);
@@ -120,7 +106,7 @@ export default function Home() {
   }
 
   return (
-    <SafeAreaView className="bg-background flex-1">
+    <SafeAreaView className="bg-background">
       <FlatList
         data={
           productsError
@@ -136,19 +122,19 @@ export default function Home() {
               ? `skeleton-${index}`
               : products[index].id.toString()
         }
-        renderItem={productsLoading ? renderSkeleton : renderProduct}
+        renderItem={
+          productsError
+            ? null
+            : productsLoading
+              ? renderSkeleton
+              : renderProduct
+        }
         numColumns={2}
         columnWrapperStyle={{
           justifyContent: "space-between",
           paddingHorizontal: 16,
         }}
-        ListHeaderComponent={() => (
-          <ListHeader
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            onSearch={handleSearch}
-          />
-        )}
+        ListHeaderComponent={ListHeader}
         ListEmptyComponent={
           <View className="items-center px-4 py-10">
             <Image source={SadDog} className="aspect-square h-60" />
@@ -173,15 +159,7 @@ export default function Home() {
   );
 }
 
-function ListHeader({
-  searchQuery,
-  setSearchQuery,
-  onSearch,
-}: {
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  onSearch: () => void;
-}) {
+function ListHeader() {
   const {
     data: categories,
     isPending: categoriesLoading,
@@ -196,28 +174,22 @@ function ListHeader({
         </Text>
       </View>
 
-      <View className="h-16 flex-row items-center gap-2.5 space-x-3">
+      {/* <View className="h-16 flex-row items-center gap-2.5 space-x-3">
         <View className="h-full flex-1 flex-row items-center space-x-2 rounded-xl bg-gray-100 px-4 py-3">
-          <TouchableOpacity onPress={onSearch}>
-            <Search size={20} color="gray" />
-          </TouchableOpacity>
+          <Search size={20} color="gray" />
           <TextInput
-            placeholder="Search products..."
+            placeholder="Search"
             className="flex-1 pl-3 text-gray-700"
             placeholderTextColor="#aaa"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            onSubmitEditing={onSearch}
-            returnKeyType="search"
           />
         </View>
-        {/* <TouchableOpacity
+        <TouchableOpacity
           activeOpacity={0.7}
           className="flex aspect-square h-full items-center justify-center rounded-xl bg-primary"
         >
           <SlidersHorizontal size={20} color="white" />
-        </TouchableOpacity> */}
-      </View>
+        </TouchableOpacity>
+      </View> */}
 
       <Text className="mb-2 mt-6 text-lg font-bold">Top Categories</Text>
       <View className="flex-row gap-3 space-x-3">
@@ -231,7 +203,7 @@ function ListHeader({
             ))}
           </View>
         ) : categoriesError || !categories || categories.length === 0 ? (
-          <View className="h-24 w-full flex-1 items-center justify-center">
+          <View className="w=full h-24 flex-1 items-center justify-center">
             <Text>No categories available.</Text>
           </View>
         ) : (

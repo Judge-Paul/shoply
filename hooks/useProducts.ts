@@ -22,40 +22,17 @@ export interface Product {
   updatedAt: string;
 }
 
-interface UseProductsParams {
-  categorySlug?: string;
-  searchQuery?: string;
-}
-
-export default function useProducts(params?: UseProductsParams | string) {
-  const { categorySlug, searchQuery } =
-    typeof params === "string"
-      ? { categorySlug: params, searchQuery: undefined }
-      : params || {};
-
-  const queryKey = [
-    "products",
-    ...(categorySlug ? [{ category: categorySlug }] : []),
-    ...(searchQuery ? [{ search: searchQuery }] : []),
-  ];
+export default function useProducts(categorySlug?: string) {
+  const queryKey = categorySlug
+    ? ["products", { category: categorySlug }]
+    : ["products"];
 
   return useQuery({
     queryKey,
     queryFn: async () => {
-      let url = "/products";
-      const queryParams: string[] = [];
-
-      if (categorySlug) {
-        queryParams.push(`categorySlug=${encodeURIComponent(categorySlug)}`);
-      }
-
-      if (searchQuery) {
-        queryParams.push(`title=${encodeURIComponent(searchQuery)}`);
-      }
-
-      if (queryParams.length > 0) {
-        url += `?${queryParams.join("&")}`;
-      }
+      const url = categorySlug
+        ? `/products?categorySlug=${categorySlug}`
+        : "/products";
 
       const res = await api.get<Product[]>(url);
       const data = res.data.slice(0, 14).map((product) => ({
