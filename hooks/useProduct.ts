@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import api from "@utils/api";
+import api from "@/utils/api";
 import { Product } from "./useProducts";
-import { convertToNaira } from "@utils/currency";
+import { convertToNaira } from "@/utils/currency";
 
 interface UseProductOptions {
   initialTitle?: string;

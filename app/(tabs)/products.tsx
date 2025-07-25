@@ -11,9 +11,9 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft, Minus, Plus } from "lucide-react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import useProducts, { Product } from "hooks/useProducts";
-import { useCart } from "context/CartContext";
-import SadDog from "@assets/sad-dog.png";
+import useProducts, { Product } from "@/hooks/useProducts";
+import { useCart } from "@/context/CartContext";
+import SadDog from "@/assets/sad-dog.png";
 import { BlurView } from "expo-blur";
 
 export default function Products() {
@@ -119,7 +119,7 @@ export default function Products() {
   }
 
   return (
-    <SafeAreaView className="bg-background flex-1">
+    <SafeAreaView className="bg-background">
       <View className="absolute left-0 right-0 top-0 z-10">
         <BlurView
           intensity={50}
@@ -155,7 +155,8 @@ export default function Products() {
               ? `skeleton-${i}`
               : products[i].id.toString()
         }
-        className="pt-12"
+        className="h-screen pt-12"
+        contentContainerClassName="pb-36"
         renderItem={error ? null : loading ? renderSkeleton : renderProduct}
         numColumns={2}
         columnWrapperStyle={{

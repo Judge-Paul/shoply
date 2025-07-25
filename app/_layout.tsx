@@ -10,7 +10,7 @@ import {
   NotifierComponents,
 } from "react-native-notifier";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { CartProvider } from "context/CartContext";
+import { CartProvider } from "@/context/CartContext";
 
 import "./global.css";
 

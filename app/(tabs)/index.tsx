@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
-  TextInput,
   Image,
   TouchableOpacity,
   FlatList,
@@ -10,12 +9,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Minus, Plus, Search, SlidersHorizontal } from "lucide-react-native";
-import cn from "@utils/cn";
+import cn from "@/utils/cn";
 import { router } from "expo-router";
-import useProducts, { Product } from "hooks/useProducts";
-import SadDog from "@assets/sad-dog.png";
-import { useCart } from "context/CartContext";
-import useCategories from "hooks/useCategories";
+import useProducts, { Product } from "@/hooks/useProducts";
+import SadDog from "@/assets/sad-dog.png";
+import { useCart } from "@/context/CartContext";
+import useCategories from "@/hooks/useCategories";
 
 export default function Home() {
   const {
@@ -115,6 +114,8 @@ export default function Home() {
               ? (Array.from({ length: 4 }) as Product[])
               : products
         }
+        contentContainerClassName="pb-8"
+        className="h-[90vh]"
         keyExtractor={(_, index) =>
           productsError
             ? ""
@@ -203,7 +204,7 @@ function ListHeader() {
             ))}
           </View>
         ) : categoriesError || !categories || categories.length === 0 ? (
-          <View className="w=full h-24 flex-1 items-center justify-center">
+          <View className="h-24 w-full flex-1 items-center justify-center">
             <Text>No categories available.</Text>
           </View>
         ) : (

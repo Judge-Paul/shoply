@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import api from "@utils/api";
-import { convertToNaira } from "@utils/currency";
+import api from "@/utils/api";
+import { convertToNaira } from "@/utils/currency";
 
 export interface Product {
   id: number;

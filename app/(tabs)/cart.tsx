@@ -18,10 +18,10 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
-import SadDog from "@assets/sad-dog.png";
-import { useCart } from "context/CartContext";
-import { convertToNaira, convertToUSDNumber } from "@utils/currency";
-import cn from "@utils/cn";
+import SadDog from "@/assets/sad-dog.png";
+import { useCart } from "@/context/CartContext";
+import { convertToNaira, convertToUSDNumber } from "@/utils/currency";
+import cn from "@/utils/cn";
 import { useState } from "react";
 import { Notifier, NotifierComponents } from "react-native-notifier";
 

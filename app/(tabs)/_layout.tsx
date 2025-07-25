@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import { Home, Package, ShoppingCart } from "lucide-react-native";
 import { Platform, Text, View } from "react-native";
-import { useCart } from "context/CartContext";
+import { useCart } from "@/context/CartContext";
 
 export default function TabLayout() {
   const { totalQuantity } = useCart();

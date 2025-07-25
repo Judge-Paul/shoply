@@ -12,10 +12,10 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { ChevronLeft, Plus, Minus, ShoppingCart } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useRef, useEffect } from "react";
-import useProduct from "hooks/useProduct";
-import SadDog from "assets/sad-dog.png";
+import useProduct from "@/hooks/useProduct";
+import SadDog from "@/assets/sad-dog.png";
 import { BlurView } from "expo-blur";
-import { useCart } from "context/CartContext";
+import { useCart } from "@/context/CartContext";
 
 export default function ProductDetail() {
   const { id, title, price, image } = useLocalSearchParams();
