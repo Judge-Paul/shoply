@@ -77,9 +77,11 @@ This project fulfills all required features plus several enhancements to showcas
 Testing videos demonstrating the app functionality on both platforms are attached below:
 
 - **iOS Demo Video** - Shows app performance on iPhone
+https://github.com/user-attachments/assets/070d9e47-490e-4033-b2d6-5cfe665d24f3
+
 - **Android Demo Video** - Demonstrates Android compatibility
 
 ---
 
-**Design Inspiration**: https://www.figma.com/design/ngTvMK3GQ69aR7ukL3MOc8/Shopping-App-UI-Kit---Community--Community-?node-id=113-7674&p=f&t=g7iMFFePXaZIGbRM-0
+**Design Inspiration**: https://www.figma.com/design/ngTvMK3GQ69aR7ukL3MOc8/Shopping-App-UI-Kit---Community--Community-?node-id=113-7674&p=f&t=g7iMFFePXaZIGbRM-0  
 **Platform**: React Native with Expo
