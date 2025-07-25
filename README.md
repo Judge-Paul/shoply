@@ -21,7 +21,6 @@ This project fulfills all required features plus several enhancements to showcas
 
 ### ⭐ Enhanced Features Added
 
-- **Search Functionality** - Real-time product search
 - **Category Browsing** - Browse products by categories
 - **Pull-to-Refresh** - Refresh product listings
 - **Promo Code System** - Apply discount codes (try "2025" for ₦2,025 off!)
@@ -34,7 +33,7 @@ This project fulfills all required features plus several enhancements to showcas
 
 ### Smart Shopping Experience
 
-- **Browse & Search**: Explore products by category or search by name
+- **Browse & Search**: Explore products by category
 - **Product Details**: View detailed information with large images and descriptions
 - **One-Tap Shopping**: Add items to cart directly from browse screens
 - **Real-Time Updates**: Cart count and totals update instantly
@@ -62,7 +61,7 @@ This project fulfills all required features plus several enhancements to showcas
 
 ## 📱 App Screens
 
-1. **Home Screen**: Product grid with categories and search
+1. **Home Screen**: Product grid with categories search
 2. **Products Screen**: Category-filtered product listings
 3. **Product Detail**: Individual product information and cart actions
 4. **Cart Screen**: Order management with checkout functionality
